@@ -71,18 +71,18 @@ regressor.fit(X_train, y_train, epochs=100, batch_size=30)
 # Part 3 - Making the predictions and visualising the results
 
 # Getting the real stock price of 2017
-test_data = pd.read_csv('msft.csv')
-test_data = test_data.reindex(index=dataset_train.index[::-1])
+test_data = pd.read_csv('aaon.csv')
+test_data = test_data.reindex(index=test_data.index[::-1])
 test_data = test_data.reset_index()
 test_data = test_data.drop(columns=['index'])
 test_set = []
-for i in range(1, len(dataset_train)):
+for i in range(1, len(test_data)):
     temp_set = []
-    temp_set.append(dataset_train['close'][i-1])
-    temp_set.append(dataset_train['open'][i])
-    temp_set.append(dataset_train['high'][i-1])
-    temp_set.append(dataset_train['low'][i-1])
-    temp_set.append(dataset_train['close'][i])
+    temp_set.append(test_data['close'][i-1])
+    temp_set.append(test_data['open'][i])
+    temp_set.append(test_data['high'][i-1])
+    temp_set.append(test_data['low'][i-1])
+    temp_set.append(test_data['close'][i])
     test_set.append(temp_set)
     
 sct = MinMaxScaler(feature_range=(0, 1))
