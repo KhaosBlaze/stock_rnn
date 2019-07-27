@@ -74,18 +74,34 @@ regressor.fit(X_train, y_train, epochs=100, batch_size=30)
 
 real_stock_price = real_stock_price = dataset_train.iloc[:, 4].values
 
-# Getting the predicted stock price of 2017
-dataset_total = pd.concat((dataset_train['Open'], dataset_test['Open']), axis=0)
-inputs = dataset_total[len(dataset_total) - len(dataset_test) - 60:].values
-inputs = inputs.reshape(-1, 1)
-inputs = sc.transform(inputs)
-X_test = []
-for i in range(60, 80):
-    X_test.append(inputs[i - 60:i, 0])
-X_test = np.array(X_test)
-X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
-predicted_stock_price = regressor.predict(X_test)
+#Get that trend
+real_stock_trend = []
+for i in range(0, len(real_stock_price)):
+    blargh = False
+    if real_stock_price[i] > real_stock_price[i-1]:
+        blargh = True
+    real_stock_trend.append(blargh)
+
+# Guess the trend (prone to overfitting)
+# X_test = np.array(X_test)
+#X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
+    
+predicted_stock_price = regressor.predict(X_train)
 predicted_stock_price = sc.inverse_transform(predicted_stock_price)
+
+predicted_stock_trend = []
+for i in range(1, len(predicted_stock_price)):
+    blargh = False
+    if real_stock_price[i] > real_stock_price[i-1]:
+        blargh = True
+    predicted_stock_trend.append(blargh)
+    
+score = 0
+for y,z in real_stock_trend, predicted_stock_trend:
+    if y == z:
+        score += 1 
+
+final_score = ((score / len(predicted_stock_trend)) * 100)
 
 # =============================================================================
 # # Visualising the results
