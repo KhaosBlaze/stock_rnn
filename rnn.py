@@ -1,11 +1,20 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 
 # Importing the training set
 dataset_train = pd.read_csv('msft.csv')
-training_set = dataset_train.iloc[:, 1:2].values
-
+dataset_train = dataset_train.reindex(index=dataset_train.index[::-1])
+dataset_train = dataset_train.reset_index()
+dataset_train = dataset_train.drop(columns=['index'])
+training_set = []
+for i in range(1, len(dataset_train)):
+    temp_set = []
+    temp_set.append(dataset_train['close'][i-1])
+    temp_set.append(dataset_train['open'][i])
+    temp_set.append(dataset_train['high'][i-1])
+    temp_set.append(dataset_train['low'][i-1])
+    temp_set.append(dataset_train['close'][i])
+    training_set.append(temp_set)
 # Feature Scaling
 from sklearn.preprocessing import MinMaxScaler
 
@@ -15,13 +24,13 @@ training_set_scaled = sc.fit_transform(training_set)
 # Creating a data structure with 60 timesteps and 1 output
 X_train = []
 y_train = []
-for i in range(60, 1258):
-    X_train.append(training_set_scaled[i - 60:i, 0])
-    y_train.append(training_set_scaled[i, 0])
+for i in range(60, len(training_set_scaled)):
+    X_train.append(training_set_scaled[i - 60:i, 0:4])
+    y_train.append(training_set_scaled[i, 4])
 X_train, y_train = np.array(X_train), np.array(y_train)
 
 # Reshaping
-X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
+#X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
 
 # Part 2 - Building the RNN
 
@@ -35,7 +44,7 @@ from keras.layers import Dropout
 regressor = Sequential()
 
 # Adding the first LSTM layer and some Dropout regularisation
-regressor.add(LSTM(units=50, return_sequences=True, input_shape=(X_train.shape[1], 1)))
+regressor.add(LSTM(units=50, return_sequences=True, input_shape=(X_train.shape[1], 4)))
 regressor.add(Dropout(0.2))
 
 # Adding a second LSTM layer and some Dropout regularisation
@@ -62,8 +71,8 @@ regressor.fit(X_train, y_train, epochs=100, batch_size=30)
 # Part 3 - Making the predictions and visualising the results
 
 # Getting the real stock price of 2017
-dataset_test = pd.read_csv('Google_Stock_Price_Test.csv')
-real_stock_price = dataset_test.iloc[:, 1:2].values
+
+real_stock_price = real_stock_price = dataset_train.iloc[:, 4].values
 
 # Getting the predicted stock price of 2017
 dataset_total = pd.concat((dataset_train['Open'], dataset_test['Open']), axis=0)
@@ -78,14 +87,16 @@ X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
 predicted_stock_price = regressor.predict(X_test)
 predicted_stock_price = sc.inverse_transform(predicted_stock_price)
 
-# Visualising the results
-plt.plot(real_stock_price, color='red', label='Real Google Stock Price')
-plt.plot(predicted_stock_price, color='blue', label='Predicted Google Stock Price')
-plt.title('Google Stock Price Prediction')
-plt.xlabel('Time')
-plt.ylabel('Google Stock Price')
-plt.legend()
-plt.show()
+# =============================================================================
+# # Visualising the results
+# plt.plot(real_stock_price, color='red', label='Real Google Stock Price')
+# plt.plot(predicted_stock_price, color='blue', label='Predicted Google Stock Price')
+# plt.title('Google Stock Price Prediction')
+# plt.xlabel('Time')
+# plt.ylabel('Google Stock Price')
+# plt.legend()
+# plt.show()
+# =============================================================================
 
 import math
 from sklearn.metrics import mean_squared_error
