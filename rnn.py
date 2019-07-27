@@ -110,7 +110,7 @@ for i in range(0, len(real_stock_price)):
 #X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
     
 predicted_stock_price = regressor.predict(X_test)
-predicted_stock_price = sct.inverse_transform(predicted_stock_price)
+#predicted_stock_price = sct.inverse_transform(predicted_stock_price)
 
 predicted_stock_trend = []
 for i in range(1, len(predicted_stock_price)):
@@ -138,20 +138,22 @@ final_score = ((score / len(predicted_stock_trend)) * 100)
 # plt.show()
 # =============================================================================
 
-import math
-from sklearn.metrics import mean_squared_error
-
-rmse = math.sqrt(mean_squared_error(real_stock_price, predicted_stock_price))
-
-
-def getDiff(l):
-    q = []
-    for i in range(1, len(l) - 1):
-        q.append(l[i] - l[i - 1])
-    return q['Value']
-
-
-psp = getDiff(predicted_stock_price)
+# =============================================================================
+# import math
+# from sklearn.metrics import mean_squared_error
+# 
+# rmse = math.sqrt(mean_squared_error(real_stock_price, predicted_stock_price))
+# 
+# 
+# def getDiff(l):
+#     q = []
+#     for i in range(1, len(l) - 1):
+#         q.append(l[i] - l[i - 1])
+#     return q['Value']
+# 
+# 
+# psp = getDiff(predicted_stock_price)
+# =============================================================================
 
 
 
