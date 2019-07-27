@@ -71,8 +71,31 @@ regressor.fit(X_train, y_train, epochs=100, batch_size=30)
 # Part 3 - Making the predictions and visualising the results
 
 # Getting the real stock price of 2017
+test_data = pd.read_csv('msft.csv')
+test_data = test_data.reindex(index=dataset_train.index[::-1])
+test_data = test_data.reset_index()
+test_data = test_data.drop(columns=['index'])
+test_set = []
+for i in range(1, len(dataset_train)):
+    temp_set = []
+    temp_set.append(dataset_train['close'][i-1])
+    temp_set.append(dataset_train['open'][i])
+    temp_set.append(dataset_train['high'][i-1])
+    temp_set.append(dataset_train['low'][i-1])
+    temp_set.append(dataset_train['close'][i])
+    test_set.append(temp_set)
+    
+sct = MinMaxScaler(feature_range=(0, 1))
+test_set_scaled = sct.fit_transform(test_set)
 
-real_stock_price = real_stock_price = dataset_train.iloc[:, 4].values
+X_test = []
+y_test = []
+for i in range(60, len(test_set_scaled)):
+    X_test.append(test_set_scaled[i - 60:i, 0:4])
+    y_test.append(test_set_scaled[i, 4])
+X_test, y_test = np.array(X_test), np.array(y_test)
+
+real_stock_price = y_test
 
 #Get that trend
 real_stock_trend = []
@@ -86,8 +109,8 @@ for i in range(0, len(real_stock_price)):
 # X_test = np.array(X_test)
 #X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[1], 1))
     
-predicted_stock_price = regressor.predict(X_train)
-predicted_stock_price = sc.inverse_transform(predicted_stock_price)
+predicted_stock_price = regressor.predict(X_test)
+predicted_stock_price = sct.inverse_transform(predicted_stock_price)
 
 predicted_stock_trend = []
 for i in range(1, len(predicted_stock_price)):
@@ -96,9 +119,10 @@ for i in range(1, len(predicted_stock_price)):
         blargh = True
     predicted_stock_trend.append(blargh)
     
+real_stock_trend = real_stock_trend[1:]
 score = 0
-for y,z in real_stock_trend, predicted_stock_trend:
-    if y == z:
+for i in range(0, len(real_stock_trend)):
+    if real_stock_trend[i] == predicted_stock_trend[i]:
         score += 1 
 
 final_score = ((score / len(predicted_stock_trend)) * 100)
