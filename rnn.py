@@ -120,7 +120,7 @@ predicted_stock_price = regressor.predict(X_test)
 predicted_stock_trend = []
 for i in range(1, len(predicted_stock_price)):
     blargh = False
-    if real_stock_price[i] > real_stock_price[i-1]:
+    if predicted_stock_price[i] > predicted_stock_price[i-1]:
         blargh = True
     predicted_stock_trend.append(blargh)
     
