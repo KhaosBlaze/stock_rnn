@@ -2,13 +2,30 @@ import numpy as np
 import pandas as pd
 import random
 from sklearn.preprocessing import MinMaxScaler
-# Importing the Keras libraries and packages
+from sklearn.model_selection import GridSearchCV
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
+from keras.wrappers.scikit_learn import KerasClassifier
+from configparser import ConfigParser
 
 days_to_train_on = 60
+
+def build_Stanley(hu, ha, oa, op, loss):#Build Stanley
+    stanley = Sequential()
+    stanley.add(LSTM(units=50, activation='relu', return_sequences=True, input_shape=(days_to_train_on, 4)))
+    stanley.add(Dropout(0.25))
+    stanley.add(LSTM(units=50, activation='relu', return_sequences=True))
+    stanley.add(Dropout(0.3))
+    stanley.add(LSTM(units=50, activation='relu', return_sequences=True))
+    stanley.add(Dropout(0.3))
+    stanley.add(LSTM(units=50, activation='relu'))
+    stanley.add(Dropout(0.3))
+    stanley.add(Dense(units=1, activation='sigmoid'))
+    stanley.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])
+    return stanley
+
 
 def get_X_Y(stock):
 
@@ -74,47 +91,36 @@ def get_a_symbol():
     print(temp)
     return str(temp)
 
-#Build Stanley
-stanley = Sequential()
-# Adding the first LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=50, activation='relu', return_sequences=True, input_shape=(days_to_train_on, 4)))
-stanley.add(Dropout(0.25))
-# Adding a second LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=50, activation='relu', return_sequences=True))
-stanley.add(Dropout(0.3))
-# Adding a third LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=50, activation='relu', return_sequences=True))
-stanley.add(Dropout(0.3))
-# Adding a fourth LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=50, activation='relu'))
-stanley.add(Dropout(0.3))
-# Adding the output layer
-stanley.add(Dense(units=1, activation='sigmoid'))
-# Compiling the RNN
-stanley.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])
+varz = ConfigParser()
+varz.read('stanley.rekt')
+parameters = {'batch_size': list(map(int, varz['BRAINZ']['batch_size'].split(','))),
+              'epochs': list(map(int, varz['BRAINZ']['epochs'].split(','))),
+              'hu': list(map(int, varz['BRAINZ']['hidden_layer_nodes'].split(','))),
+              'ha': varz['BRAINZ']['hidden_layer_activation'],
+              'oa': varz['BRAINZ']['output_activation'],
+              'op': varz['BRAINZ']['optimizer'],
+              'loss': varz['BRAINZ']['loss']
+              }
 
-for i in range(0, 5):
-    #Train the boi
-    X_train, y_train = get_X_Y(get_a_symbol())
-    # Fitting the RNN to the Training set
-    stanley.fit(X_train, y_train, epochs=50, batch_size=30)
+stanley = KerasClassifier(build_fn = build_Stanley)
+
+grid = GridSearchCV(estimator = stanley,
+                    param_grid = parameters,
+                    scoring = 'accuracy',
+                    cv = 10)
+
+X_train, y_train = get_X_Y(get_a_symbol())
+
+grid.fit(X_train, y_train)
+
+
+#for i in range(0, 5):
+#    #Train the boi
+#    X_train, y_train = get_X_Y(get_a_symbol())
+#    # Fitting the RNN to the Training set
+#    stanley.fit(X_train, y_train, epochs=50, batch_size=30)
 
 # Part 3 - Making the predictions and visualising the results
-X_test, y_test = get_X_Y(get_a_symbol())
 
-#PLace your bets boys    
-predicted_stock_trend = stanley.predict(X_test)
-    
-#Remove first price because it's unloved and unwanted
-real_stock_trend = y_test
-
-results = survey_says(predicted_stock_trend, real_stock_trend)
-
-#Pretty number
-print('How many data points: ' + str(results['datapoints']))
-print('Times guessed correctly: ' + str(results['reacts_correctly']))
-print('Percentage of correct guesses: ' + str(results['percentage']))
-print('How many times Stnaley was wrong: ' + str(results['loss']))
-print('How many times Stanley guessed up trend:'+ str(results['success']))
-print('How many times Stanley did not guess: ' +str(results['skip']))
-print('Pass to Fail number, not a ratio, p shit metric, ngl:' + str(results['pass to fail']))
+print("The best params are: " + grid.best_params_)
+print("HIghest achieved accuracy is: " + grid.best_score_)

@@ -1,0 +1,8 @@
+[BRAINZ]
+hidden_layer_nodes=10,30,50
+hidden_layer_activation=relu
+output_activation=sigmoid
+optimizer=adam,rmsprop
+loss=binary_crossentropy
+batch_size=15,30,40
+epochs=50,75,100
