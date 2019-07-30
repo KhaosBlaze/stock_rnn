@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 # Importing the training set || Training on MSFT
-dataset_train = pd.read_csv('msft.csv')
+dataset_train = pd.read_csv('stocks/msft.csv')
 
 #reverse datatype indexing so it's from oldest to newest
 dataset_train = dataset_train.reindex(index=dataset_train.index[::-1])
@@ -74,7 +74,7 @@ regressor.fit(X_train, y_train, epochs=100, batch_size=30)
 
 
 # Getting the AAON stock price
-test_data = pd.read_csv('aaon.csv')
+test_data = pd.read_csv('stocks/aaon.csv')
 #Reverse again
 test_data = test_data.reindex(index=test_data.index[::-1])
 test_data = test_data.reset_index()
