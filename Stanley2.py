@@ -10,6 +10,10 @@ from keras.layers import Dropout
 from keras.wrappers.scikit_learn import KerasClassifier
 from configparser import ConfigParser
 
+
+varz = ConfigParser()
+varz.read('stanley.rekt')
+
 days_to_train_on = 60
 
 def build_Stanley(hu, ha, oa, op, loss):#Build Stanley
@@ -96,10 +100,10 @@ varz.read('stanley.rekt')
 parameters = {'batch_size': list(map(int, varz['BRAINZ']['batch_size'].split(','))),
               'epochs': list(map(int, varz['BRAINZ']['epochs'].split(','))),
               'hu': list(map(int, varz['BRAINZ']['hidden_layer_nodes'].split(','))),
-              'ha': varz['BRAINZ']['hidden_layer_activation'],
-              'oa': varz['BRAINZ']['output_activation'],
-              'op': varz['BRAINZ']['optimizer'],
-              'loss': varz['BRAINZ']['loss']
+              'ha': list(varz['BRAINZ']['hidden_layer_activation'].split(',')),
+              'oa': list(varz['BRAINZ']['output_activation'].split(',')),
+              'op': list(varz['BRAINZ']['optimizer'].split(',')),
+              'loss': list(varz['BRAINZ']['loss'].split(','))
               }
 
 stanley = KerasClassifier(build_fn = build_Stanley)
@@ -107,7 +111,7 @@ stanley = KerasClassifier(build_fn = build_Stanley)
 grid = GridSearchCV(estimator = stanley,
                     param_grid = parameters,
                     scoring = 'accuracy',
-                    cv = 10)
+                    cv = 3)
 
 X_train, y_train = get_X_Y(get_a_symbol())
 

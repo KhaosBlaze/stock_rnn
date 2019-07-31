@@ -33,16 +33,16 @@ def get_X_Y(stock):
             temp_set.append(0)
         training_set.append(temp_set)
         
-    # Get that Min/Max scale on
-    sc = MinMaxScaler(feature_range=(0, 1))
-    training_set_scaled = sc.fit_transform(training_set)
-
     # Creating a data structure with days_to_train_on timesteps and 1 output
     X = []
     y = []
     for i in range(days_to_train_on, len(training_set_scaled)):
         X.append(training_set_scaled[i - days_to_train_on:i, 0:4])
         y.append(training_set_scaled[i, 4])
+
+    sc = MinMaxScaler(feature_range=(-1, 1))
+    X = sc.fit_transform(X)
+
     X, y = np.array(X), np.array(y)
     return X, y
 
@@ -93,7 +93,7 @@ stanley.add(Dense(units=1, activation='sigmoid'))
 # Compiling the RNN
 stanley.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])
 
-for i in range(0, 5):
+for i in range(0, 1):
     #Train the boi
     X_train, y_train = get_X_Y(get_a_symbol())
     # Fitting the RNN to the Training set
