@@ -37,7 +37,7 @@ def get_X_Y(stock):
 
     sc = ColumnTransformer(
         [("normies", MinMaxScaler(feature_range=(-1, 1)), slice(0,4)),
-         ("normie2", MinMaxScaler(feature_range=(0, 1)), slice(4))])
+         ("normie2", MinMaxScaler(feature_range=(0, 1)), slice(4,5))])
     training_set_scaled = sc.fit_transform(training_set)
 
     # Creating a data structure with days_to_train_on timesteps and 1 output
@@ -48,10 +48,10 @@ def get_X_Y(stock):
         y.append(training_set_scaled[i, 4])
 
     X, y = np.array(X), np.array(y).astype(int)
-    np.savetxt(stock+'.out', y, delimiter=',')
+    np.savetxt('output/'+stock+'.out', y, delimiter=',')
     return X, y
 
-def survey_says(prediction, for_realz, confidence=.5):
+def survey_says(prediction, for_realz, confidence=.8):
     scores = {'reacts_correctly':0, 'loss':0, 'percentage':0, 'skip':0}
     score = 0
     did_not_guess = 0
@@ -82,27 +82,30 @@ def get_a_symbol():
 #Build Stanley
 stanley = Sequential()
 # Adding the first LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=30, activation='relu', return_sequences=True, input_shape=(days_to_train_on, 4)))
+stanley.add(LSTM(units=60, activation='elu', return_sequences=True, input_shape=(days_to_train_on, 4)))
 stanley.add(Dropout(0.25))
 # Adding a second LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=30, activation='relu', return_sequences=True))
+stanley.add(LSTM(units=60, activation='elu', return_sequences=True))
 stanley.add(Dropout(0.3))
 # Adding a third LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=30, activation='relu', return_sequences=True))
-stanley.add(Dropout(0.3))
+stanley.add(LSTM(units=60, activation='elu', return_sequences=True))
+stanley.add(Dropout(0.25))
 # Adding a fourth LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=30, activation='relu'))
+stanley.add(LSTM(units=60, activation='elu'))
 stanley.add(Dropout(0.3))
 # Adding the output layer
 stanley.add(Dense(units=1, activation='sigmoid'))
 # Compiling the RNN
 stanley.compile(optimizer='nadam', loss='binary_crossentropy', metrics=['accuracy'])
 
-for i in range(0, 3):
+x1, y1 = get_X_Y(get_a_symbol())
+stanley.fit(x1, y1, epochs=3, batch_size=60)
+
+for i in range(0, 10):
     #Train the boi
     X_train, y_train = get_X_Y(get_a_symbol())
     # Fitting the RNN to the Training set
-    stanley.fit(X_train, y_train, epochs=10, batch_size=30)
+    stanley.fit(X_train, y_train, epochs=30, batch_size=32)
 
 # Part 3 - Making the predictions and visualising the results
 X_test, y_test = get_X_Y(get_a_symbol())
@@ -125,3 +128,4 @@ print('How many times Stanley did not guess: ' +str(results['skip']))
 print('Pass to Fail number, not a ratio, p shit metric, ngl:' + str(results['pass to fail']))
 
 np.savetxt('test.out', predicted_stock_trend, delimiter=',')
+
