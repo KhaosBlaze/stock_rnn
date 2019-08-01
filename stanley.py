@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import random
+from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import MinMaxScaler
 # Importing the Keras libraries and packages
 from keras.models import Sequential
@@ -33,20 +34,24 @@ def get_X_Y(stock):
             temp_set.append(0)
         training_set.append(temp_set)
         
+
+    sc = ColumnTransformer(
+        [("normies", MinMaxScaler(feature_range=(-1, 1)), slice(0,4)),
+         ("normie2", MinMaxScaler(feature_range=(0, 1)), slice(4))])
+    training_set_scaled = sc.fit_transform(training_set)
+
     # Creating a data structure with days_to_train_on timesteps and 1 output
     X = []
     y = []
     for i in range(days_to_train_on, len(training_set_scaled)):
-        X.append(training_set_scaled[i - days_to_train_on:i, 0:4])
+        X.append(training_set_scaled[i - days_to_train_on:i, 0:4].tolist())
         y.append(training_set_scaled[i, 4])
 
-    sc = MinMaxScaler(feature_range=(-1, 1))
-    X = sc.fit_transform(X)
-
-    X, y = np.array(X), np.array(y)
+    X, y = np.array(X), np.array(y).astype(int)
+    np.savetxt(stock+'.out', y, delimiter=',')
     return X, y
 
-def survey_says(prediction, for_realz, confidence=.8):
+def survey_says(prediction, for_realz, confidence=.5):
     scores = {'reacts_correctly':0, 'loss':0, 'percentage':0, 'skip':0}
     score = 0
     did_not_guess = 0
@@ -69,7 +74,7 @@ def survey_says(prediction, for_realz, confidence=.8):
 
 def get_a_symbol():
     all_of_em = [line.rstrip('\n') for line in open("stocks/list.txt")]
-    all_of_em = all_of_em[:910]
+    all_of_em = all_of_em[:1410]
     temp = all_of_em[random.randrange(len(all_of_em))]
     print(temp)
     return str(temp)
@@ -77,27 +82,27 @@ def get_a_symbol():
 #Build Stanley
 stanley = Sequential()
 # Adding the first LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=50, activation='relu', return_sequences=True, input_shape=(days_to_train_on, 4)))
+stanley.add(LSTM(units=30, activation='relu', return_sequences=True, input_shape=(days_to_train_on, 4)))
 stanley.add(Dropout(0.25))
 # Adding a second LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=50, activation='relu', return_sequences=True))
+stanley.add(LSTM(units=30, activation='relu', return_sequences=True))
 stanley.add(Dropout(0.3))
 # Adding a third LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=50, activation='relu', return_sequences=True))
+stanley.add(LSTM(units=30, activation='relu', return_sequences=True))
 stanley.add(Dropout(0.3))
 # Adding a fourth LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=50, activation='relu'))
+stanley.add(LSTM(units=30, activation='relu'))
 stanley.add(Dropout(0.3))
 # Adding the output layer
 stanley.add(Dense(units=1, activation='sigmoid'))
 # Compiling the RNN
-stanley.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])
+stanley.compile(optimizer='nadam', loss='binary_crossentropy', metrics=['accuracy'])
 
-for i in range(0, 1):
+for i in range(0, 3):
     #Train the boi
     X_train, y_train = get_X_Y(get_a_symbol())
     # Fitting the RNN to the Training set
-    stanley.fit(X_train, y_train, epochs=50, batch_size=30)
+    stanley.fit(X_train, y_train, epochs=10, batch_size=30)
 
 # Part 3 - Making the predictions and visualising the results
 X_test, y_test = get_X_Y(get_a_symbol())
@@ -118,3 +123,5 @@ print('How many times Stnaley was wrong: ' + str(results['loss']))
 print('How many times Stanley guessed up trend:'+ str(results['success']))
 print('How many times Stanley did not guess: ' +str(results['skip']))
 print('Pass to Fail number, not a ratio, p shit metric, ngl:' + str(results['pass to fail']))
+
+np.savetxt('test.out', predicted_stock_trend, delimiter=',')
