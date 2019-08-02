@@ -22,8 +22,11 @@ async def user(ctx):
 	await bot.say(ctx.message.author)
 
 @bot.command(pass_context=True)
-async def is_stanley_awake(ctx):
-	await bot.say(os.system('ls -la'))
+async def is_stanley_awake():
+	lil_stan = ''
+	big_stan = ''
+	lil_stan = os.system('pgrep -f "stanley.py" > /dev/null && echo Running').read
+	big_stan = os.system('pgrep -f "Stanley.py" > /dev/null && echo Running').read
 
 @bot.command(pass_context=True)
 async def sort_me(ctx):
