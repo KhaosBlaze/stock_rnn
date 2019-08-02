@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
 import asyncio
+import os
 from random import randint
 
 bot = commands.Bot(command_prefix='$')
@@ -21,17 +22,8 @@ async def user(ctx):
 	await bot.say(ctx.message.author)
 
 @bot.command(pass_context=True)
-async def miss_adam(ctx):
-	if str(ctx.message.author).lower() == "wulfieh#0806":
-		await bot.say("Sorted to HufflePuff!")
-	elif str(ctx.message.author).lower() == "khaosblaze#2647":
-		await bot.say("You finally got something right")
-	elif str(ctx.message.author).lower() == "mat#2851":
-		await bot.say(":upside_down: Can you hear us better if we're orientated your way?")
-	elif str(ctx.message.author).lower() == "donahue#7228":
-		await bot.say("Hey Adam, I'm going to specifically "+violence()+" you in your "+body())
-	await bot.say("Hey " + best_bud().capitalize() +", I'm gonna " + violence() + " you in your "+body())
-	print("Adam imitated")
+async def is_stanley_awake(ctx):
+	os.system('ls -la')
 
 @bot.command(pass_context=True)
 async def sort_me(ctx):
