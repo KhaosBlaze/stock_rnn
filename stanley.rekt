@@ -6,3 +6,4 @@ optimizer=adam,rmsprop
 loss=binary_crossentropy
 batch_size=15,30,40
 epochs=50,75,100
+dtt=60
