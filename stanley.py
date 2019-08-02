@@ -82,16 +82,16 @@ def get_a_symbol():
 #Build Stanley
 stanley = Sequential()
 # Adding the first LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=60, activation='elu', return_sequences=True, input_shape=(days_to_train_on, 4)))
+stanley.add(LSTM(units=60, activation='tanh', return_sequences=True, input_shape=(days_to_train_on, 4)))
 stanley.add(Dropout(0.25))
 # Adding a second LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=60, activation='elu', return_sequences=True))
+stanley.add(LSTM(units=60, activation='tanh', return_sequences=True))
 stanley.add(Dropout(0.3))
 # Adding a third LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=60, activation='elu', return_sequences=True))
+stanley.add(LSTM(units=60, activation='tanh', return_sequences=True))
 stanley.add(Dropout(0.25))
 # Adding a fourth LSTM layer and some Dropout regularisation
-stanley.add(LSTM(units=60, activation='elu'))
+stanley.add(LSTM(units=60, activation='tanh'))
 stanley.add(Dropout(0.3))
 # Adding the output layer
 stanley.add(Dense(units=1, activation='sigmoid'))
@@ -101,11 +101,11 @@ stanley.compile(optimizer='nadam', loss='binary_crossentropy', metrics=['accurac
 x1, y1 = get_X_Y(get_a_symbol())
 stanley.fit(x1, y1, epochs=3, batch_size=60)
 
-for i in range(0, 10):
+for i in range(0, 5):
     #Train the boi
     X_train, y_train = get_X_Y(get_a_symbol())
     # Fitting the RNN to the Training set
-    stanley.fit(X_train, y_train, epochs=30, batch_size=32)
+    stanley.fit(X_train, y_train, epochs=80, batch_size=15)
 
 # Part 3 - Making the predictions and visualising the results
 X_test, y_test = get_X_Y(get_a_symbol())
