@@ -23,7 +23,7 @@ async def user(ctx):
 
 @bot.command(pass_context=True)
 async def is_stanley_awake(ctx):
-	os.system('ls -la')
+	await bot.say(os.system('ls -la'))
 
 @bot.command(pass_context=True)
 async def sort_me(ctx):
