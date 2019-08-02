@@ -19,7 +19,7 @@ stanley = build_Stanley(60, 'tanh', 'sigmoid', 'nadam', 'binary_crossentropy', d
 # # Compiling the RNN
 # stanley.compile(optimizer='nadam', loss='binary_crossentropy', metrics=['accuracy'])
 
-x1, y1 = get_X_Y(get_a_symbol())
+x1, y1 = get_X_Y(get_a_symbol(), days_to_train_on)
 stanley.fit(x1, y1, epochs=3, batch_size=60)
 
 for i in range(0, 5):
