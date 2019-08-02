@@ -8,7 +8,7 @@ from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
 
-def get_X_Y(stock):
+def get_X_Y(stock, days_to_train_on):
     # Importing the training set || Training on MSFT
     dataset = pd.read_csv('stocks/' + stock + '.csv')
     # reverse datatype indexing so it's from oldest to newest

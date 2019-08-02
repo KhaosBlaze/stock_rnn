@@ -25,7 +25,7 @@ grid = GridSearchCV(estimator = stanley,
                     scoring = 'accuracy',
                     cv = 3)
 
-X_train, y_train = get_X_Y(get_a_symbol())
+X_train, y_train = get_X_Y(get_a_symbol(), days_to_train_on)
 
 grid.fit(X_train, y_train)
 

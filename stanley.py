@@ -2,9 +2,9 @@ import numpy as np
 from subconscious import get_X_Y, build_Stanley, survey_says, get_a_symbol
 # Importing the Keras libraries and packages
 
-days_to_train_on = 60
+days_to_train_on = 45
 
-stanley = build_Stanley(60, 'tanh', 'sigmoid', 'nadam', 'binary_crossentropy', 60)
+stanley = build_Stanley(60, 'tanh', 'sigmoid', 'nadam', 'binary_crossentropy', days_to_train_on)
 #Build Stanley
 # stanley = Sequential()
 # stanley.add(LSTM(units=60, activation='tanh', return_sequences=True, input_shape=(days_to_train_on, 4)))
@@ -24,12 +24,12 @@ stanley.fit(x1, y1, epochs=3, batch_size=60)
 
 for i in range(0, 5):
     #Train the boi
-    X_train, y_train = get_X_Y(get_a_symbol())
+    X_train, y_train = get_X_Y(get_a_symbol(), days_to_train_on)
     # Fitting the RNN to the Training set
     stanley.fit(X_train, y_train, epochs=80, batch_size=15)
 
 # Part 3 - Making the predictions and visualising the results
-X_test, y_test = get_X_Y(get_a_symbol())
+X_test, y_test = get_X_Y(get_a_symbol(), days_to_train_on)
 
 #PLace your bets boys    
 predicted_stock_trend = stanley.predict(X_test)
