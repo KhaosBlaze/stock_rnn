@@ -25,8 +25,8 @@ async def user(ctx):
 async def is_stanley_awake():
 	lil_stan = ''
 	big_stan = ''
-	lil_stan = os.system('pgrep -f "stanley.py" > /dev/null && echo Running').read
-	big_stan = os.system('pgrep -f "Stanley.py" > /dev/null && echo Running').read
+	lil_stan = os.system('pgrep -f "stanley.py" > /dev/null && echo Running').read()
+	big_stan = os.system('pgrep -f "Stanley.py" > /dev/null && echo Running').read()
 	if lii_stan == 'Running' or big_stan == 'Running':
 		await bot.say("Stanley still chuggin!")
 
