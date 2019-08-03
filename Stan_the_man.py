@@ -29,7 +29,7 @@ async def results():
 	checker = []
 	with open("test.out","r") as results:
 		for line in results:
-			checker.append()
+			checker.append(line)
 
 	if all(x == checker[0] for x in chcker):
 		await bot.say("https://media1.tenor.com/images/f89c189082d675ca5d27eb5028969beb/tenor.gif?itemid=10555880")
