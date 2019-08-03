@@ -27,7 +27,9 @@ for i in range(0, 300):
     X_train, y_train = get_X_Y(get_a_symbol(), days_to_train_on)
     # Fitting the RNN to the Training set
     stanley.fit(X_train, y_train, epochs=40, batch_size=20)
-    np.savetxt('output/' + str(i) + '.out', stanley, delimiter=',')
+    temp_test, temp_y = get_X_Y(get_a_symbol(), days_to_train_on)
+    looped_test = stanley.predict(temp_test)
+    np.savetxt('output/' + str(i) + '.out', looped_test, delimiter=',')
     save_it(stanley)
 
 # Part 3 - Making the predictions and visualising the results
