@@ -31,7 +31,7 @@ async def results():
 		for line in results:
 			checker.append(line)
 
-	if all(x == checker[0] for x in chcker):
+	if all(x == checker[0] for x in checker):
 		await bot.say("https://media1.tenor.com/images/f89c189082d675ca5d27eb5028969beb/tenor.gif?itemid=10555880")
 	else:
 		await bot.say("https://i.redd.it/usiqjl0cbyr11.jpg")
