@@ -44,7 +44,6 @@ def get_X_Y(stock, days_to_train_on):
         y.append(training_set_scaled[i, 5])
 
     X, y = np.array(X), np.array(y).astype(int)
-    np.savetxt('output/' + stock + '.out', y, delimiter=',')
     return X, y
 
 
@@ -90,3 +89,11 @@ def build_Stanley(hu, ha, oa, op, loss, dtt):#Build Stanley
     stanley.add(Dense(units=1, activation=oa))
     stanley.compile(optimizer=op, loss=loss, metrics=['accuracy'])
     return stanley
+
+def save_it(model):
+    model_json = model.to_json()
+    with open("stanley.json", "w") as json_file:
+        json_file.write(model_json)
+    # serialize weights to HDF5
+    model.save_weights("stanley.h5")
+    print("Saved model to disk")

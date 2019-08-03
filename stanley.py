@@ -1,5 +1,5 @@
 import numpy as np
-from subconscious import get_X_Y, build_Stanley, survey_says, get_a_symbol
+from subconscious import get_X_Y, build_Stanley, survey_says, get_a_symbol, save_it
 # Importing the Keras libraries and packages
 
 days_to_train_on = 45
@@ -27,6 +27,8 @@ for i in range(0, 300):
     X_train, y_train = get_X_Y(get_a_symbol(), days_to_train_on)
     # Fitting the RNN to the Training set
     stanley.fit(X_train, y_train, epochs=40, batch_size=20)
+    np.savetxt('output/' + i + '.out', y, delimiter=',')
+    save_it(stanley)
 
 # Part 3 - Making the predictions and visualising the results
 X_test, y_test = get_X_Y(get_a_symbol(), days_to_train_on)
