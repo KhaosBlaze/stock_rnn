@@ -27,7 +27,7 @@ async def done_yet():
 @bot.command(pass_context=True)
 async def results():
 	checker = []
-	while open("test.out","r") as reults:
+	with open("test.out","r") as reults:
 		for line in results:
 			checker.append()
 
