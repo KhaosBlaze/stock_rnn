@@ -23,6 +23,7 @@ def get_X_Y(stock, days_to_train_on):
         temp_set.append(dataset['close'][i - 1] - dataset['open'][i - 1])
         temp_set.append(dataset['high'][i - 1])
         temp_set.append(dataset['low'][i - 1])
+        temp_set.append(dataset['volume'][i-1])
         temp_set.append(dataset['open'][i])
         if dataset['close'][i] > dataset['open'][i]:
             temp_set.append(1)
@@ -31,16 +32,16 @@ def get_X_Y(stock, days_to_train_on):
         training_set.append(temp_set)
 
     sc = ColumnTransformer(
-        [("normies", MinMaxScaler(feature_range=(-1, 1)), slice(0, 4)),
-         ("normie2", MinMaxScaler(feature_range=(0, 1)), slice(4, 5))])
+        [("normies", MinMaxScaler(feature_range=(-1, 1)), slice(0, 5)),
+         ("normie2", MinMaxScaler(feature_range=(0, 1)), slice(5, 6))])
     training_set_scaled = sc.fit_transform(training_set)
 
     # Creating a data structure with days_to_train_on timesteps and 1 output
     X = []
     y = []
     for i in range(days_to_train_on, len(training_set_scaled)):
-        X.append(training_set_scaled[i - days_to_train_on:i, 0:4].tolist())
-        y.append(training_set_scaled[i, 4])
+        X.append(training_set_scaled[i - days_to_train_on:i, 0:5].tolist())
+        y.append(training_set_scaled[i, 5])
 
     X, y = np.array(X), np.array(y).astype(int)
     np.savetxt('output/' + stock + '.out', y, delimiter=',')
@@ -71,21 +72,21 @@ def survey_says(prediction, for_realz, confidence=.8):
 
 def get_a_symbol():
     all_of_em = [line.rstrip('\n') for line in open("stocks/list.txt")]
-    all_of_em = all_of_em[:1410]
+    all_of_em = all_of_em[:2300]
     temp = all_of_em[random.randrange(len(all_of_em))]
     print(temp)
     return str(temp)
 
 def build_Stanley(hu, ha, oa, op, loss, dtt):#Build Stanley
     stanley = Sequential()
-    stanley.add(LSTM(units=hu, activation=ha, return_sequences=True, input_shape=(dtt, 4)))
-    stanley.add(Dropout(0.25))
+    stanley.add(LSTM(units=hu, activation=ha, return_sequences=True, input_shape=(dtt, 5)))
+    stanley.add(Dropout(0.2))
     stanley.add(LSTM(units=hu, activation=ha, return_sequences=True))
-    stanley.add(Dropout(0.3))
+    stanley.add(Dropout(0.2))
     stanley.add(LSTM(units=hu, activation=ha, return_sequences=True))
-    stanley.add(Dropout(0.3))
+    stanley.add(Dropout(0.2))
     stanley.add(LSTM(units=hu, activation=ha))
-    stanley.add(Dropout(0.3))
+    stanley.add(Dropout(0.2))
     stanley.add(Dense(units=1, activation=oa))
     stanley.compile(optimizer=op, loss=loss, metrics=['accuracy'])
     return stanley

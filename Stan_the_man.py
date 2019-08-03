@@ -26,8 +26,10 @@ async def is_stanley_awake():
 	lil_stan = ''
 	big_stan = ''
 	lil_stan = os.popen('pgrep -f "stanley.py" > /dev/null && echo Running').read()
-	big_stan = os.popen('pgrep -f "Stanley.py" > /dev/null && echo Running').read()
-	if lii_stan == 'Running' or big_stan == 'Running':
+	big_stan = os.popen('pgrep -f "stanley.py" > /dev/null && echo Running').read()
+	print(big_stan + lil_stan)
+	if lil_stan == 'Running' or big_stan == 'Running':
+		print("Huh")
 		await bot.say("Stanley still chuggin!")
 
 @bot.command(pass_context=True)
