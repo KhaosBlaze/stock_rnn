@@ -27,13 +27,13 @@ async def done_yet():
 @bot.command(pass_context=True)
 async def results():
 	checker = []
-	with open("test.out","r") as reults:
+	with open("test.out","r") as results:
 		for line in results:
 			checker.append()
 
 	if all(x == checker[0] for x in chcker):
 		await bot.say("https://media1.tenor.com/images/f89c189082d675ca5d27eb5028969beb/tenor.gif?itemid=10555880")
-	else
+	else:
 		await bot.say("https://i.redd.it/usiqjl0cbyr11.jpg")
 
 
