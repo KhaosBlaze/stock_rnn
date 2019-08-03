@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Bot
 import asyncio
+import psutil
 import os
 from random import randint
 
@@ -23,18 +24,9 @@ async def user(ctx):
 
 @bot.command(pass_context=True)
 async def is_stanley_awake():
-	lil_stan = ''
-	big_stan = ''
-	lil_stan = os.popen('pgrep -f "stanley.py" > /dev/null && echo Running').read()
-	big_stan = os.popen('pgrep -f "stanley.py" > /dev/null && echo Running').read()
-	print(big_stan + lil_stan)
-	if lil_stan == 'Running' or big_stan == 'Running':
-		print("Huh")
-		await bot.say("Stanley still chuggin!")
+	for proc in psutil.process_iter():
+		if proc.name().lower() == 'python' and 'stanley.py' in proc.cmdline():
+			await bot.say("Ya boi still chuggin")
 
-@bot.command(pass_context=True)
-async def sort_me(ctx):
-	await bot.say("You're wanting me to sort you into a fictitious house? From a fictitious world? What do I look like, some Sorting hat? Here's your damn hat")
-	await bot.say("https://vignette.wikia.nocookie.net/harrypotter/images/6/62/Sorting_Hat.png/revision/latest?cb=20161120072849")
 
 bot.run("NDY2MTE4MDU3ODQwODY5Mzc2.DiXk5g.gOzcGyDg8W__fizmj1pBmrXQzVA")
