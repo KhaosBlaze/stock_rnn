@@ -1,15 +1,5 @@
-import subconscious as sub
-
-all_of_em = [line.rstrip('\n') for line in open("stocks/list.txt")]
-
-everything = []
-for i in all_of_em:
-	temp = get_X_Y(i, 45)
-	for k in temp:
-		everything.append(k)
-
-print (len(everything))
-
+import pandas as pd
+import numpy as np
 
 def get_X_Y(stock, days_to_train_on):
     # Importing the training set || Training on MSFT
@@ -19,34 +9,30 @@ def get_X_Y(stock, days_to_train_on):
 	dataset = dataset.reset_index()
 	dataset = dataset.drop(columns=['index'])
 
-	# Setup input nodes to have closing of the previous day, opening, high/low of previous day and the closing of today (for the y value)
 	training_set = []
-	for i in range(1, len(dataset)):
-	    temp_set = []
-	    temp_set.append(dataset['close'][i - 1] - dataset['open'][i - 1])
-	    temp_set.append(dataset['high'][i - 1])
-	    temp_set.append(dataset['low'][i - 1])
-	    temp_set.append(dataset['open'][i])
-	    temp_set.append(dataset['volume'][i-1])
-	    if dataset['close'][i] > dataset['open'][i]:
-	        temp_set.append(1)
-	    else:
-	        temp_set.append(0)
-	    training_set.append(temp_set)
+    for i in range(1, len(dataset)):
+        temp_set = []
+        temp_set.append(dataset['close'][i - 1] - dataset['open'][i - 1])
+        temp_set.append(dataset['high'][i - 1])
+        temp_set.append(dataset['low'][i - 1])
+        temp_set.append(dataset['open'][i])
+        temp_set.append(dataset['volume'][i-1])
+        if dataset['close'][i] > dataset['open'][i]:
+            temp_set.append(1)
+        else:
+            temp_set.append(0)
+        training_set.append(temp_set)
 
-	sc = ColumnTransformer(
-	    [("normies", MinMaxScaler(feature_range=(-1, 1)), slice(0, 1)),
-	     ("normies_price", MinMaxScaler(feature_range=(0, 1)), slice(1, 4)),
-	     ("normies_vol", MinMaxScaler(feature_range=(0, 1)), slice(4, 5)),
-	     ("normie2", MinMaxScaler(feature_range=(0, 1)), slice(5, 6))])
-	training_set_scaled = sc.fit_transform(training_set)
+    scx = ColumnTransformer([("normies", MinMaxScaler(feature_range=(-1, 1)), slice(0, 1)),
+                            ("normies_price", MinMaxScaler(feature_range=(0, 1)), slice(1, 4)),
+                            ("normies_vol", MinMaxScaler(feature_range=(0, 1)), slice(4, 5))])
 
-	# Creating a data structure with days_to_train_on timesteps and 1 output
-X = []
-y = []
-for i in range(days_to_train_on, len(training_set_scaled)):
-    X.append(training_set_scaled[i - days_to_train_on:i, 0:5].tolist())
-    y.append(training_set_scaled[i, 5])
+    X = []
+    y = []
+    for i in range(days_to_train_on, len(training_set)):
+        x_temp = scx.fit_transform(training_set[i - days_to_train_on:i, 0:5])
+        X.append(x_temp)
+        y.append(training_set[i, 5])
 
 	X, y = np.array(X), np.array(y).astype(int)
 	return X, y
