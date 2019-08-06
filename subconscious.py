@@ -7,6 +7,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
+from keras import optimizers
 
 def get_X_Y(stock, days_to_train_on):
     # Importing the training set || Training on MSFT
@@ -80,13 +81,14 @@ def build_Stanley(hu, ha, oa, op, loss, dtt):#Build Stanley
     stanley = Sequential()
     stanley.add(LSTM(units=hu, activation=ha, return_sequences=True, input_shape=(dtt, 5)))
     stanley.add(Dropout(0.2))
-    stanley.add(LSTM(units=hu, activation=ha, return_sequences=True))
+    stanley.add(LSTM(units=hu, activation=ha, return_sequences=False))
     stanley.add(Dropout(0.2))
-    stanley.add(LSTM(units=hu, activation=ha, return_sequences=True))
-    stanley.add(Dropout(0.2))
-    stanley.add(LSTM(units=hu, activation=ha))
-    stanley.add(Dropout(0.2))
+#    stanley.add(LSTM(units=hu, activation=ha, return_sequences=True))
+#    stanley.add(Dropout(0.2))
+#    stanley.add(LSTM(units=hu, activation=ha))
+#    stanley.add(Dropout(0.2))
     stanley.add(Dense(units=1, activation=oa))
+    op = optimizers.adam(lr = 0.007, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
     stanley.compile(optimizer=op, loss=loss, metrics=['accuracy'])
     return stanley
 

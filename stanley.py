@@ -5,31 +5,20 @@ from subconscious import get_X_Y, build_Stanley, survey_says, get_a_symbol, save
 days_to_train_on = 45
 
 stanley = build_Stanley(60, 'tanh', 'sigmoid', 'adam', 'binary_crossentropy', days_to_train_on)
-#Build Stanley
-# stanley = Sequential()
-# stanley.add(LSTM(units=60, activation='tanh', return_sequences=True, input_shape=(days_to_train_on, 4)))
-# stanley.add(Dropout(0.25))
-# stanley.add(LSTM(units=60, activation='tanh', return_sequences=True))
-# stanley.add(Dropout(0.3))
-# stanley.add(LSTM(units=60, activation='tanh', return_sequences=True))
-# stanley.add(Dropout(0.25))
-# stanley.add(LSTM(units=60, activation='tanh'))
-# stanley.add(Dropout(0.3))
-# stanley.add(Dense(units=1, activation='sigmoid'))
-# # Compiling the RNN
-# stanley.compile(optimizer='nadam', loss='binary_crossentropy', metrics=['accuracy'])
 
 x1, y1 = get_X_Y(get_a_symbol(), days_to_train_on)
 stanley.fit(x1, y1, epochs=3, batch_size=10)
 
-for i in range(0, 300):
+for i in range(0, 400):
     #Train the boi
     X_train, y_train = get_X_Y(get_a_symbol(), days_to_train_on)
     # Fitting the RNN to the Training set
-    stanley.fit(X_train, y_train, epochs=40, batch_size=20)
-    temp_test, temp_y = get_X_Y(get_a_symbol(), days_to_train_on)
+    stanley.fit(X_train, y_train, epochs=20, batch_size=30)
+
+    symbol = get_a_symbol()
+    temp_test, temp_y = get_X_Y(symbol, days_to_train_on)
     looped_test = stanley.predict(temp_test)
-    np.savetxt('output/' + str(i) + '.out', looped_test, delimiter=',')
+    np.savetxt('output/' + symbol + '.out', looped_test, delimiter=',')
     save_it(stanley)
 
 # Part 3 - Making the predictions and visualising the results
