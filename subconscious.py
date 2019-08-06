@@ -4,6 +4,7 @@ import random
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.compose import ColumnTransformer
 from keras.models import Sequential
+from keras.models import model_from_json
 from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
@@ -92,10 +93,18 @@ def build_Stanley(hu, ha, oa, op, loss, dtt):#Build Stanley
     stanley.compile(optimizer=op, loss=loss, metrics=['accuracy'])
     return stanley
 
-def save_it(model):
+def save_it(model, name="stanley"):
     model_json = model.to_json()
-    with open("stanley.json", "w") as json_file:
+    with open(name+".json", "w") as json_file:
         json_file.write(model_json)
     # serialize weights to HDF5
-    model.save_weights("stanley.h5")
+    model.save_weights(name+".h5")
     print("Saved model to disk")
+
+def get_stanley(name):
+    with open(name+'.json', 'r') as json_file:
+        model = model_from_json(json_file.read())
+    model.load_weights(name+'.h5')
+    op = optimizers.adam(lr = 0.007, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+    model.compile(optimizer=op, loss="binary_crossentropy", metrics=['accuracy'])
+    return model
