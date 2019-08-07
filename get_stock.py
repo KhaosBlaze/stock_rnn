@@ -13,7 +13,7 @@ dataset = dataset.reset_index()
 dataset = dataset.drop(columns=['index'])
 
 output = []
-for i in range(1, len(dataset)):
+for i in range(46, len(dataset)):
     if dataset['close'][i] > dataset['open'][i]:
         output.append(1)
     else:
