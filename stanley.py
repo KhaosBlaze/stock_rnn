@@ -1,15 +1,15 @@
 import numpy as np
-from subconscious import get_X_Y, build_Stanley, survey_says, get_a_symbol, save_it
-# Importing the Keras libraries and packages
+from subconscious import get_X_Y, build_Stanley, survey_says, get_a_symbol, save_it, get_stanley
 
 days_to_train_on = 45
 
-stanley = build_Stanley(60, 'tanh', 'sigmoid', 'adam', 'binary_crossentropy', days_to_train_on)
+#stanley = build_Stanley(60, 'tanh', 'sigmoid', 'adam', 'binary_crossentropy', days_to_train_on)
+stanley = get_stanley("stanley")
 
-x1, y1 = get_X_Y(get_a_symbol(), days_to_train_on)
-stanley.fit(x1, y1, epochs=3, batch_size=10)
+#x1, y1 = get_X_Y(get_a_symbol(), days_to_train_on)
+#stanley.fit(x1, y1, epochs=3, batch_size=10)
 
-for i in range(0, 400):
+for i in range(0, 1000):
     #Train the boi
     X_train, y_train = get_X_Y(get_a_symbol(), days_to_train_on)
     # Fitting the RNN to the Training set
