@@ -13,7 +13,7 @@ def shuffle(array):
 all_of_em = [line.rstrip('\n') for line in open("stocks/list.txt")]
 so_many_stocks = []
 for i in range(0, 10):
-    so_many_stocks += suffle(all_of_em[:2300])
+    so_many_stocks += shuffle(all_of_em[:2300])
 
 count = 0
 
