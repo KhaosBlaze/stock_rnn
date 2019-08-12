@@ -21,4 +21,4 @@ for i in range(46, len(dataset)):
 
 y = np.array(output).astype(int)
 
-np.savetxt(stock+'.out', y, delimiter=',')
+np.savetxt('stocks_adjusted/'+stock+'.out', y, delimiter=',')
