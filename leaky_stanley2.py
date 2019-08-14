@@ -2,34 +2,45 @@ import numpy as np
 from keras.layers import Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
+from keras.layers import LeakyReLU
 from keras import optimizers
 from keras.models import Sequential
 from subconscious import get_X_Y, survey_says
-days_to_train_on = 60
+days_to_train_on = 45
 
-def build_Stanley(hu, ha, oa, op, loss, dtt):
+def build_Stanley(hu, oa, op, loss, dtt):
 	stanley = Sequential()
-	stanley.add(LSTM(units=hu, activation=ha, return_sequences=True, input_shape=(dtt, 5)))
+	stanley.add(LSTM(units=hu, return_sequences=True, input_shape=(dtt, 5)))
+	stanley.add(LeakyReLU(alpha=0.05))
 	stanley.add(Dropout(0.2))
-	stanley.add(LSTM(units=hu, activation=ha, return_sequences=True))
-	stanley.add(Dropout(0.2))
-	stanley.add(LSTM(units=hu, activation=ha, return_sequences=False))
+	stanley.add(LSTM(units=hu, return_sequences=False))
+	stanley.add(LeakyReLU(alpha=0.05))
 	stanley.add(Dropout(0.2))
 	#    stanley.add(LSTM(units=hu, activation=ha))
 	#    stanley.add(Dropout(0.2))
-	stanley.add(Dense(units=1, activation=oa))
-	op = optimizers.adam(lr = 0.006, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+	stanley.add(Dense(units=2, activation=oa))
+	#op = optimizers.adam(lr = 0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+	op = optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
 	stanley.compile(optimizer=op, loss=loss, metrics=['accuracy'])
 	return stanley
 
-stanley = build_Stanley(90, 'tanh', 'sigmoid', 'adam', 'binary_crossentropy', days_to_train_on)
+stanley = build_Stanley(7, 'softmax', 'adam', 'categorical_crossentropy', days_to_train_on)
 
 
 X_train, y_train = get_X_Y('MSFT', days_to_train_on)
 
-stanley.fit(X_train, y_train, epochs=500, batch_size=32)
+y_new = []
+for i in y_train:
+	if i == 1:
+		y_new.append([1, 0])
+	else:
+		y_new.append([0, 1])
+y_new = np.array(y_new)
 
-temp_test, temp_y = get_X_Y(symbol, days_to_train_on)
+
+stanley.fit(X_train, y_new, epochs=1000, batch_size=27)
+
+temp_test, temp_y = get_X_Y('MSFT', days_to_train_on)
 y = stanley.predict(temp_test)
 
 # Part 3 - Making the predictions and visualising the results
@@ -39,7 +50,13 @@ X_test, y_test = get_X_Y('MSFT', days_to_train_on)
 predicted_stock_trend = stanley.predict(X_test)
     
 #Remove first price because it's unloved and unwanted
-real_stock_trend = y_test
+real_stock_trend = []
+for i in y_test:
+	if i[0] == 1:
+		new_stock_trend.append(1)
+	else:
+		new_stock_trend.append(0)
+real_stock_trend = np.array(real_stock_trend)
 
 results = survey_says(predicted_stock_trend, real_stock_trend)
 
