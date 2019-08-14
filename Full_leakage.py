@@ -1,7 +1,12 @@
 import random
 import numpy as np
-from keras.models import model_from_json
+from keras.layers import Dense
+from keras.layers import LSTM
+from keras.layers import Dropout
+from keras.layers import LeakyReLU
 from keras import optimizers
+from keras.models import Sequential
+from keras.models import model_from_json
 from subconscious import get_X_Y, survey_says, get_a_symbol, save_it
 
 days_to_train_on = 45
@@ -31,23 +36,31 @@ def y_to_y_new(arr):
 def y_new_to_y(arr):
     y_test = []
     for i in arr:
-        if i[0] == 1:
+        if i[0] > i[1]:
             y_test.append(1)
         else:
             y_test.append(0)
     y_test = np.array(y_test)
     return y_test
 
+def build_Stanley(hu, oa, loss, dtt):
+    stanley = Sequential()
+    stanley.add(LSTM(units=hu, return_sequences=True, input_shape=(dtt, 5)))
+    stanley.add(LeakyReLU(alpha=0.3))
+    stanley.add(Dropout(0.2))
+    stanley.add(LSTM(units=hu, return_sequences=False))
+    stanley.add(LeakyReLU(alpha=0.2))
+    stanley.add(Dropout(0.2))
+    #    stanley.add(LSTM(units=hu, activation=ha))
+    #    stanley.add(Dropout(0.2))
+    stanley.add(Dense(units=2, activation=oa))
+    #op = optimizers.adam(lr = 0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
+    op = optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
+    stanley.compile(optimizer=op, loss=loss, metrics=['accuracy'])
+    return stanley
 
-# stanley = build_Stanley(10, 'softmax', 'categorical_crossentropy', days_to_train_on)
 
-name = "leek"
-
-with open(name+'.json', 'r') as json_file:
-    stanley = model_from_json(json_file.read())
-stanley.load_weights(name+'.h5')
-op = optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
-stanley.compile(optimizer=op, loss='categorical_crossentropy', metrics=['accuracy'])
+stanley = build_Stanley(10, 'hard_sigmoid', 'categorical_crossentropy', days_to_train_on)
 
 for i in all_of_em:
     X_train, y_train = get_X_Y(i, days_to_train_on)
@@ -87,4 +100,5 @@ print('How many times Stanley did not guess: ' + str(results['skip']))
 print('Pass to Fail number, not a ratio, p shit metric, ngl:' + str(results['pass to fail']))
 
 np.savetxt('leak.out', predicted_stock_trend, delimiter=',')
+
 
