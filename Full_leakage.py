@@ -32,12 +32,12 @@ def build_Stanley(hu, oa, loss, dtt):
     stanley.add(Dropout(0.2))
     stanley.add(Dense(units=1, activation=oa))
     #op = optimizers.adam(lr = 0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
-    op = optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
+    op = optimizers.Adadelta(lr=0.9, rho=0.95, epsilon=None, decay=0.0)
     stanley.compile(optimizer=op, loss=loss, metrics=['accuracy'])
     return stanley
 
 
-stanley = build_Stanley(10, 'hard_sigmoid', 'binary_crossentropy', days_to_train_on)
+stanley = build_Stanley(20, 'hard_sigmoid', 'binary_crossentropy', days_to_train_on)
 
 for i in all_of_em:
     X_train, y_train = get_X_Y(i, days_to_train_on)
