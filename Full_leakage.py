@@ -36,8 +36,16 @@ def build_Stanley(hu, oa, loss, dtt):
     stanley.compile(optimizer=op, loss=loss, metrics=['accuracy'])
     return stanley
 
+def get_stanley(name="leek"):
+    with open(name+'.json', 'r') as json_file:
+        model = model_from_json(json_file.read())
+    model.load_weights(name+'.h5')
+    op = optimizers.Adadelta(lr=0.9, rho=0.95, epsilon=None, decay=0.0)
+    model.compile(optimizer=op, loss="binary_crossentropy", metrics=['accuracy'])
+    return model
 
-stanley = build_Stanley(20, 'hard_sigmoid', 'binary_crossentropy', days_to_train_on)
+#stanley = build_Stanley(20, 'hard_sigmoid', 'binary_crossentropy', days_to_train_on)
+stanley = get_stanley()
 
 for i in all_of_em:
     X_train, y_train = get_X_Y(i, days_to_train_on)
@@ -46,8 +54,9 @@ for i in all_of_em:
 
     symbol = get_a_symbol()
     temp_test, temp_y = get_X_Y(symbol, days_to_train_on)
+    looped = stanley.predict(temp_test)
 
-    np.savetxt('output_leak/' + symbol + '.out', temp_y, delimiter=',')
+    np.savetxt('output_leak/' + symbol + '.out', looped, delimiter=',')
 
     count += 1
     print(count)
