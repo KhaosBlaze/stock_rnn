@@ -55,7 +55,7 @@ for i in all_of_em:
     symbol = get_a_symbol()
     temp_test, temp_y = get_X_Y(symbol, days_to_train_on)
     looped = stanley.predict(temp_test)
-
+    print(symbol)
     np.savetxt('output_leak/' + symbol + '.out', looped, delimiter=',')
 
     count += 1
