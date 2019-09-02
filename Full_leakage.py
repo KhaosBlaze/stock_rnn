@@ -49,7 +49,7 @@ stanley = get_stanley()
 
 for i in all_of_em:
     X_train, y_train = get_X_Y(i, days_to_train_on)
-
+    print(i)
     stanley.fit(X_train, y_train, epochs=20, batch_size=27)
 
     symbol = get_a_symbol()
