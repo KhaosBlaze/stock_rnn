@@ -17,8 +17,9 @@ def shuffle(array):
 
 all_of_em = [line.rstrip('\n') for line in open("stocks/list.txt")]
 so_many_stocks = []
-for i in range(0, 10):
+for i in range(0, 30):
     so_many_stocks += shuffle(all_of_em[:2300])
+print(len(so_many_stocks))
 
 count = 0
 
@@ -47,7 +48,7 @@ def get_stanley(name="leek"):
 #stanley = build_Stanley(20, 'hard_sigmoid', 'binary_crossentropy', days_to_train_on)
 stanley = get_stanley()
 
-for i in all_of_em:
+for i in so_many_stocks:
     X_train, y_train = get_X_Y(i, days_to_train_on)
     print(i)
     stanley.fit(X_train, y_train, epochs=20, batch_size=27)
