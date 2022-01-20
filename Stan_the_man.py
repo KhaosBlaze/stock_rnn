@@ -38,4 +38,4 @@ async def results():
 
 
 
-bot.run("NDY2MTE4MDU3ODQwODY5Mzc2.DiXk5g.gOzcGyDg8W__fizmj1pBmrXQzVA")
+bot.run("[Bot_Token]")
