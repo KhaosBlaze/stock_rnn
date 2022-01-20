@@ -16,8 +16,9 @@ def shuffle(array):
 
 all_of_em = [line.rstrip('\n') for line in open("stocks/list.txt")]
 so_many_stocks = []
-for i in range(0, 10):
+for i in range(0, 30):
     so_many_stocks += shuffle(all_of_em[:2300])
+print(len(so_many_stocks))
 
 count = 0
 
@@ -31,22 +32,31 @@ def build_Stanley(hu, oa, loss, dtt):
     stanley.add(Dropout(0.2))
     stanley.add(Dense(units=1, activation=oa))
     #op = optimizers.adam(lr = 0.001, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
-    op = optimizers.Adadelta(lr=1.0, rho=0.95, epsilon=None, decay=0.0)
+    op = optimizers.Adadelta(lr=0.9, rho=0.95, epsilon=None, decay=0.0)
     stanley.compile(optimizer=op, loss=loss, metrics=['accuracy'])
     return stanley
 
+def get_stanley(name="leek"):
+    with open(name+'.json', 'r') as json_file:
+        model = model_from_json(json_file.read())
+    model.load_weights(name+'.h5')
+    op = optimizers.Adadelta(lr=0.9, rho=0.95, epsilon=None, decay=0.0)
+    model.compile(optimizer=op, loss="binary_crossentropy", metrics=['accuracy'])
+    return model
 
-stanley = build_Stanley(10, 'hard_sigmoid', 'binary_crossentropy', days_to_train_on)
+#stanley = build_Stanley(20, 'hard_sigmoid', 'binary_crossentropy', days_to_train_on)
+stanley = get_stanley()
 
-for i in all_of_em:
+for i in so_many_stocks:
     X_train, y_train = get_X_Y(i, days_to_train_on)
-
+    print(i)
     stanley.fit(X_train, y_train, epochs=20, batch_size=27)
 
     symbol = get_a_symbol()
     temp_test, temp_y = get_X_Y(symbol, days_to_train_on)
-
-    np.savetxt('output_leak/' + symbol + '.out', temp_y, delimiter=',')
+    looped = stanley.predict(temp_test)
+    print(symbol)
+    np.savetxt('output_leak/' + symbol + '.out', looped, delimiter=',')
 
     count += 1
     print(count)
