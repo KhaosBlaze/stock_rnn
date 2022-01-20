@@ -6,7 +6,6 @@ from keras.layers import Dropout
 from keras.layers import LeakyReLU
 from keras import optimizers
 from keras.models import Sequential
-from keras.models import model_from_json
 from subconscious import get_X_Y, survey_says, get_a_symbol, save_it
 
 days_to_train_on = 45

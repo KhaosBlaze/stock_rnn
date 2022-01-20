@@ -17,7 +17,6 @@ def get_X_Y(stock, days_to_train_on):
     dataset = dataset.reindex(index=dataset.index[::-1])
     dataset = dataset.reset_index()
     dataset = dataset.drop(columns=['index'])
-
     training_set = []
     for i in range(1, len(dataset)):
         temp_set = []
@@ -31,20 +30,16 @@ def get_X_Y(stock, days_to_train_on):
         else:
             temp_set.append(0)
         training_set.append(temp_set)
-
     scx = ColumnTransformer([("normies", MinMaxScaler(feature_range=(-1, 1)), slice(0, 1)),
                             ("normies_price", MinMaxScaler(feature_range=(0, 1)), slice(1, 4)),
                             ("normies_vol", MinMaxScaler(feature_range=(0, 1)), slice(4, 5))])
-
     training_set = np.array(training_set)
-
     X = []
     y = []
     for i in range(days_to_train_on, len(training_set)):
         x_temp = scx.fit_transform(training_set[i - days_to_train_on:i, 0:5])
         X.append(x_temp)
         y.append(training_set[i, 5])
-
     X, y = np.array(X), np.array(y).astype(int)
     return X, y
 
@@ -61,7 +56,6 @@ def survey_says(prediction, for_realz, confidence=.8):
             score += 1
         else:
             scores['loss'] += 1
-
     scores['reacts_correctly'] = score
     scores['percentage'] = ((score / len(prediction)) * 100)
     scores['skip'] = did_not_guess
